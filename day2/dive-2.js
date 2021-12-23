@@ -11,10 +11,10 @@ const computePositionWithAim = (inputData) => {
       horizontal += +value;
       vertical += aim * +value;
     } else if (direction === 'up') {
-      vertical -= +value;
+      // vertical -= +value;
       aim -= +value;
     } else if (direction === 'down') {
-      vertical += +value;
+      // vertical += +value;
       aim += +value;
     }
   }
