@@ -6,7 +6,6 @@ const convertInputToBingoObject = (inputData) => {
   const rows = boards.length;
   const ticketsList = [];
   let matrix = [];
-  // console.log(boards);
   for (let rowPos = 1; rowPos < rows; rowPos++) {
     let row = boards[rowPos].trim();
     if (row === '') {
@@ -30,7 +29,9 @@ const convertInputToBingoObject = (inputData) => {
 
 const checkWinner = (ticketsList, winnersSet) => {
   const tickets = ticketsList.length;
+  const winnerTicketsIndex = [];
   for (let ticketIdx = 0; ticketIdx < tickets; ticketIdx++) {
+    if (winnersSet.has(ticketIdx)) continue;
     const ticket = ticketsList[ticketIdx];
     const rows = ticket.length;
     let isFilled = false;
@@ -44,24 +45,27 @@ const checkWinner = (ticketsList, winnersSet) => {
         }
       }
 
-      if (isFilled) return ticketIdx;
+      if (isFilled) {
+        winnerTicketsIndex.push(ticketIdx);
+        continue;
+      }
     }
 
     // check for column
-    for (let col = 0; col < ticket[0].length; col++) {
+    for (let row = 0; row < rows; row++) {
       isFilled = true;
-      for (let row = 0; row < rows; row++) {
-        if (ticket[row][col] !== -1) {
+      for (let col = 0; col < ticket[row].length; col++) {
+        if (ticket[col][row] !== -1) {
           isFilled = false;
           break;
         }
       }
 
-      if (isFilled) return ticketIdx;
+      if (isFilled) winnerTicketsIndex.push(ticketIdx);
     }
   }
 
-  return -1;
+  return winnerTicketsIndex;
 };
 
 const playBingo = (ticketsList, numbers) => {
@@ -85,12 +89,11 @@ const playBingo = (ticketsList, numbers) => {
       }
     }
 
-    const winnerPosition = checkWinner(ticketsList, winnersSet);
-    if (winnerPosition !== -1) {
+    const winnerTicketsIndex = checkWinner(ticketsList, winnersSet);
+    winnerTicketsIndex.forEach((winnerPosition) => {
       winnersSet.add(winnerPosition);
-      console.log('winnersSet = ', winnersSet);
       winnersInfoList.push({ winnerPosition, bingoNumber });
-    }
+    });
   }
   console.log(winnersInfoList);
   console.log(winnersInfoList[winnersInfoList.length - 1]);
@@ -98,13 +101,13 @@ const playBingo = (ticketsList, numbers) => {
 };
 
 (async () => {
-  const INPUT_PATH = path.join(__dirname, 'small-input.txt');
+  const INPUT_PATH = path.join(__dirname, 'input.txt');
   const inputData = await readInput(INPUT_PATH);
   const { ticketsList, numbers } = convertInputToBingoObject(inputData);
-  console.log(ticketsList);
   const { winnerPosition, bingoNumber } = playBingo(ticketsList, numbers);
   let sum = 0;
 
+  console.log(ticketsList[winnerPosition]);
   for (const row of ticketsList[winnerPosition]) {
     for (const elt of row) {
       if (elt !== -1) sum += elt;
