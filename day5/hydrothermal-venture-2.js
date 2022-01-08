@@ -37,16 +37,27 @@ const generateMatrix = ({ rows, cols }) => {
 
 const solve = (matrix, data) => {
   data.forEach(({ x1, y1, x2, y2 }) => {
-    let startX = x1;
-    let startY = y1;
-    let endX = x2;
-    let endY = y2;
-    while (true) {
-      matrix[startX][startY] += 1;
-      if (startX === x2 && startY === y2) break;
-      startX += endX > startX ? 1 : -1;
-      startY += endY > startY ? 1 : -1;
-      console.log({ startX, startY });
+    if (x1 === x2) {
+      let start = Math.min(y1, y2);
+      let end = Math.max(y1, y2);
+      while (start <= end) {
+        matrix[x1][start] += 1;
+        start += 1;
+      }
+    } else if (y1 === y2) {
+      let start = Math.min(x1, x2);
+      let end = Math.max(x1, x2);
+      while (start <= end) {
+        matrix[start][y1] += 1;
+        start += 1;
+      }
+    } else {
+      while (true) {
+        matrix[x1][y1] += 1;
+        if (x1 === x2 && y1 === y2) break;
+        x1 += x2 > x1 ? 1 : -1;
+        y1 += y2 > y1 ? 1 : -1;
+      }
     }
   });
 
@@ -65,7 +76,7 @@ const countIntersectingLines = (matrix) => {
 };
 
 (async () => {
-  const INPUT_PATH = path.join(__dirname, 'small-input.txt');
+  const INPUT_PATH = path.join(__dirname, 'input.txt');
   const inputData = await readInput(INPUT_PATH);
   const data = parseCordinates(inputData);
   const dimensions = getMatrixDimensions(data);
