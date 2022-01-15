@@ -17,21 +17,22 @@ const getSegmentsToDigitMap = () => {
 };
 
 const solve = (inputList) => {
-  const segmentVsDigitMap = getSegmentsToDigitMap();
+  let ans = 0;
   for (const line of inputList) {
     const outputSegment = line.split(' | ')[1];
     const outputList = outputSegment.split(' ');
-    for (const output of outputList) {
-      // TODO:
-      // sort output string
-      // compare output against map
-      // if its in 1,4,7,8 -> increment count
-    }
+    const uniqueSegments = outputList.filter((output) => {
+      const length = output.length;
+      return length === 2 || length === 4 || length === 3 || length === 7;
+    });
+    ans += uniqueSegments.length;
   }
+
+  return ans;
 };
 
 (async () => {
   const INPUT_PATH = path.join(__dirname, 'input.txt');
   const inputList = convertInputToList(await readInput(INPUT_PATH));
-  console.log(solve(inputList));
+  console.log('Unique segments = ', solve(inputList));
 })();
