@@ -55,17 +55,18 @@ const computeMapping = (signalPattern, segmentVsDigitMap) => {
     if (lengthVsSegmentMap[length]) {
       const targetSegment = lengthVsSegmentMap[length];
       for (let idx = 0; idx < length; idx++) {
-        if (!charactersMapping[signal[idx]])
-          charactersMapping[signal[idx]] = [];
-        const mappingList = charactersMapping[signal[idx]];
-        mappingList.push(targetSegment[idx]);
-        charactersMapping[signal[idx]] = mappingList;
+        if (!charactersMapping[targetSegment[idx]])
+          charactersMapping[targetSegment[idx]] = [];
+        const mappingList = charactersMapping[targetSegment[idx]];
+        mappingList.push(signal[idx]);
+        charactersMapping[targetSegment[idx]] = mappingList;
       }
     }
   }
 
   return resolveCharactersMapping(charactersMapping);
 };
+
 const solve = (inputList) => {
   let ans = 0;
   const segmentVsDigitMap = getSegmentsToDigitMap();
@@ -103,25 +104,62 @@ const solve = (inputList) => {
   return ans;
 };
 
+function solve2(input) {
+  return input
+    .split('\n')
+    .map((row) => row.split(' ').map((pattern) => [...pattern].sort()))
+    .reduce((sum, row) => {
+      let patterns = row.slice(0, 10);
+      let output = row.slice(11).map((pattern) => pattern.join(''));
+
+      let digits = [];
+
+      digits[1] = patterns.find((pattern) => pattern.length === 2);
+      digits[7] = patterns.find((pattern) => pattern.length === 3);
+      digits[4] = patterns.find((pattern) => pattern.length === 4);
+      digits[8] = patterns.find((pattern) => pattern.length === 7);
+
+      digits[6] = patterns.find(
+        (pattern) =>
+          pattern.length === 6 &&
+          digits[1].some((segment) => !pattern.includes(segment))
+      );
+      digits[0] = patterns.find(
+        (pattern) =>
+          pattern.length === 6 &&
+          pattern !== digits[6] &&
+          digits[4].some((segment) => !pattern.includes(segment))
+      );
+      digits[9] = patterns.find(
+        (pattern) =>
+          pattern.length === 6 && pattern !== digits[6] && pattern !== digits[0]
+      );
+
+      digits[3] = patterns.find(
+        (pattern) =>
+          pattern.length === 5 &&
+          digits[1].every((segment) => pattern.includes(segment))
+      );
+      digits[5] = patterns.find(
+        (pattern) =>
+          pattern.length === 5 &&
+          pattern.every((segment) => digits[6].includes(segment))
+      );
+      digits[2] = patterns.find(
+        (pattern) =>
+          pattern.length === 5 && pattern !== digits[3] && pattern !== digits[5]
+      );
+
+      digits = digits.map((pattern) => pattern.join(''));
+
+      return (
+        sum + Number(output.map((pattern) => digits.indexOf(pattern)).join(''))
+      );
+    }, 0);
+}
+
 (async () => {
-  const INPUT_PATH = path.join(__dirname, 'small-input.txt');
-  const inputList = convertInputToList(await readInput(INPUT_PATH));
-  console.log('Unique segments = ', solve(inputList));
+  const INPUT_PATH = path.join(__dirname, 'input.txt');
+  // const inputList = convertInputToList(await readInput(INPUT_PATH));
+  console.log('Unique segments = ', solve2(await readInput(INPUT_PATH)));
 })();
-
-//
-//
-// a: f
-// f: b
-// d: g
-// g: e
-// c: a
-// e: d
-// b: c
-
-// acedgfb
-// fadgebc
-
-// cefdb
-// { f: 'b', a: 'f', c: 'a', g: 'e', d: 'g', b: 'c', e: 'd' }
-// adbgc
