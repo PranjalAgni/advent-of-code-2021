@@ -1,5 +1,5 @@
 const path = require('path');
-const { readInput, convertInputToList } = require('../helpers/data');
+const { readInput } = require('../helpers/data');
 
 const parseInput = (inputData) => {
   const rows = inputData.split('\n');
@@ -41,14 +41,14 @@ const solve = (matrix) => {
           }
         }
       }
-      if (isFound) answer += 1;
+      if (isFound) answer += 1 + value;
     }
   }
 
   return answer;
 };
 (async () => {
-  const INPUT_PATH = path.join(__dirname, 'small-input.txt');
+  const INPUT_PATH = path.join(__dirname, 'input.txt');
   const inputData = await readInput(INPUT_PATH);
   const matrix = parseInput(inputData);
   console.log(solve(matrix));
